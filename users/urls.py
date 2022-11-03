@@ -8,4 +8,7 @@ urlpatterns=[
     
     path('',views.profiles,name='profiles'),
     path('profile/<str:pk>/',views.userProfile,name='user_profile'),
+    path('account/',views.userAccount,name='user_account'),
+    path('update-account/',views.editAccount,name='edit_account'),
+
 ]

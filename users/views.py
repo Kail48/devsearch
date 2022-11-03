@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth import login,authenticate,logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from .forms import CustomUserCreationForm
+from users.forms import CustomUserCreationForm,ProfileForm
 # Create your views here.
 def profiles(request):
     all_profiles=Profile.objects.all()
@@ -58,7 +58,8 @@ def registerUser(request):
             user1.save()
             print("saved")
             messages.success(request,"Your account has been created!")
-            return redirect('login')
+            login(request,user1)
+            return redirect('user_account')
         else:
             messages.error(request,"someting wong!")
             context={'page':page,'form':form}
@@ -66,3 +67,24 @@ def registerUser(request):
             
     context={'page':page,'form':form}
     return render(request,'users/login_register.html',context)
+
+@login_required(login_url='login')
+def userAccount(request):
+    profile=request.user.profile
+    topSkills=profile.skill_set.exclude(description__exact="")
+    context={'profile':profile,'topSkills':topSkills}
+    return render(request,'users/account.html',context)
+
+@login_required(login_url='login')
+def editAccount(request):
+    profile=request.user.profile
+    form=ProfileForm(instance=profile)
+    if request.method=="POST":
+        form=ProfileForm(request.POST,request.FILES,instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect('user_account')
+
+    
+    context={'form':form}
+    return render(request,'users/profile_form.html',context)

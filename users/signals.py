@@ -11,5 +11,14 @@ def profileDeleted(sender,instance,**kwargs):
     user=instance.user
     user.delete()
 
+def profileUpdated(sender,instance,created,**kwargs):
+    user=instance.user
+    if created==False:
+        user.first_name=instance.name
+        user.username=instance.user_name
+        user.email=instance.email
+        user.save()
+
 post_save.connect(createProfile,sender=User)
+post_save.connect(profileUpdated,sender=Profile)
 post_delete.connect(profileDeleted,sender=Profile)
